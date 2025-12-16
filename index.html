@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Si Care Store - Dashboard</title>
+
+<style>
+:root{
+    --pink:#ff5c93;
+    --pink-600:#ff2f7c;
+    --bg:#fff0f6;
+    --muted:#f5f5f7;
+    --card:#ffffff;
+    --text:#333;
+}
+*{box-sizing:border-box}
+body{
+    margin:0;
+    font-family:Inter, system-ui, Arial, sans-serif;
+    background:linear-gradient(180deg,#fff0f6 0%, #fff 60%);
+    color:var(--text);
+}
+
+/* TOP BAR */
+.topbar{
+    height:72px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 22px;
+    background:var(--pink);
+    color:white;
+    position:sticky;
+    top:0;
+    z-index:50;
+    box-shadow:0 4px 10px rgba(0,0,0,.06);
+}
+.brand{
+    display:flex;
+    gap:14px;
+    align-items:center;
+}
+.logo-circle{
+    width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#ffd0e6,#ff8ab0);
+    display:flex;align-items:center;justify-content:center;font-weight:700;color:white;
+    box-shadow:0 2px 6px rgba(0,0,0,.12);
+}
+.site-title{font-weight:700;font-size:18px}
+
+/* BUTTONS */
+.btn{
+    border:0;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:600;
+}
+.btn-ghost{background:transparent;color:white;border:1px solid rgba(255,255,255,.12)}
+.btn-white{background:white;color:var(--pink);}
+
+/* LAYOUT */
+.layout{display:flex;min-height:calc(100vh - 72px);}
+.sidebar{
+    width:240px;padding:22px;
+    background:linear-gradient(180deg,#ffecf4,#ffd9e9);
+    border-right:1px solid rgba(0,0,0,0.03);
+    position:sticky;
+    top:72px;
+    height:calc(100vh - 72px);
+    overflow:auto;
+}
+.sidebar h4{margin:0 0 12px 0;color:var(--pink-600);letter-spacing:0.6px}
+.menu{display:flex;flex-direction:column;gap:8px}
+.menu button{
+    display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;
+    border:0;background:transparent;cursor:pointer;font-size:15px;color:var(--pink-600);
+}
+.menu button.active{
+    background:white;box-shadow:0 6px 18px rgba(0,0,0,.06);
+    color:var(--pink-600);font-weight:700
+}
+
+/* CONTENT */
+.content{flex:1;padding:28px;overflow:auto;}
+.section{display:none}
+.section.active{display:block}
+.card{
+    background:var(--card);border-radius:14px;padding:18px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.04);
+}
+.contact-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(200px,1fr));
+    gap:16px;
+    margin-top:12px;
+}
+
+.contact-item{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    background:var(--muted);
+    padding:14px;
+    border-radius:12px;
+}
+
+.contact-item .icon{
+    font-size:26px;
+}
+
+.contact-item a{
+    color:var(--pink-600);
+    text-decoration:none;
+    font-weight:600;
+}
+
+.contact-item a:hover{
+    text-decoration:underline;
+}
+
+
+/* PRODUCTS */
+.products-grid, .purchase-grid{
+    display:grid;grid-template-columns:repeat(auto-fit, minmax(220px,1fr));
+    gap:18px;
+}
+.product-card{
+    background:white;border-radius:12px;padding:12px;
+    text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center;
+}
+.product-card img{width:100%;height:230px;object-fit:cover;border-radius:10px}
+.product-card h4{margin:0;font-size:15px}
+.price{font-weight:700;color:var(--pink-600);}
+
+/* LIST */
+.list{display:flex;flex-direction:column;gap:10px}
+.list-item{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:12px;background:var(--muted)}
+
+/* POPUP (overlay used for all modals) */
+.overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.45);
+    display:none;place-items:center;z-index:80;
+}
+.popup{
+    background:white;padding:22px;border-radius:14px;width:320px;max-width:95%;
+    box-shadow:0 8px 20px rgba(0,0,0,0.2);
+    position:relative;
+}
+.popup h3{margin-top:0;color:var(--pink-600)}
+.popup input, .popup textarea, .popup select{margin-bottom:10px;width:100%;padding:8px;border-radius:8px;border:1px solid #e6e6e6}
+
+/* back icon inside popup */
+.popup .back-icon{
+    position:absolute;left:1px;top:3px;width:34px;height:34px;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;background:transparent;border:0;cursor:pointer;font-weight:bold;
+}
+
+/* small helpers */
+.row{display:flex;gap:10px;align-items:center}
+.small{font-size:13px;color:#666}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+    .sidebar{display:none}
+    .content{padding:14px}
+}
+
+/* Pesanan Saya card tweaks */
+.order-card{background:white;border-radius:12px;padding:12px}
+.order-actions button{margin-left:6px}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="brand">
+        <div class="logo-circle">SC</div>
+        <div>
+            <div class="site-title">SiCare Store</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.9)">Dashboard</div>
+        </div>
+    </div>
+
+    <div style="flex:1;display:flex;justify-content:center;padding:0 20px">
+        <input id="globalSearch" type="search" placeholder="Cari produk..." 
+            style="width:60%;padding:10px;border-radius:12px;border:0;max-width:560px">
+    </div>
+
+    <div class="top-actions">
+        <button class="btn btn-white" id="modeToggle">Mode Admin</button>
+        <button class="btn btn-ghost" onclick="logout()">Logout</button>
+    </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <h4>MENU</h4>
+    <div class="menu">
+        <button onclick="showSection('beranda', this)" class="active">🏠 tentang</button>
+        <button onclick="showSection('pembelian', this)">📦 Produk</button>
+        <button onclick="showSection('pesananSaya', this)">🧾 Pesanan Saya</button>
+    
+        <div style="height:10px"></div>
+        <small id="adminLabel" style="display:none;">ADMIN</small>
+        <button id="menu-stok" style="display:none" onclick="showSection('stok', this)">📋 Stok Barang</button>
+        <button id="menu-laporan" style="display:none" onclick="showSection('laporan', this)">📊 Laporan</button>
+    </div>
+</aside>
+
+<!-- CONTENT -->
+<main class="content">
+
+<!-- BERANDA -->
+<section id="beranda" class="section active">
+    <div class="card">
+        <h3>Halo Beauty Lovers! Selamat datang di SiCare Store 💖</h3>
+        <p>Saatnya manjakan rambut Anda dengan pilihan produk terbaik yang siap memberikan hasil maksimal.</p> 
+            Di sini, kami menghadirkan produk perawatan rambut pilihan untuk membantu Anda tampil lebih percaya diri. Kami percaya bahwa kecantikan tidak hanya datang dari wajah atau fashion saja, tetapi rambut yang sehat dan terawat juga memegang peran besar.
+            Perawatan rambut merupakan bagian dari rutinitas self-care yang sering kali diabaikan, padahal rambut adalah bagian pertama yang tampak saat seseorang bertemu dengan kita. Rambut yang terawat dapat memberikan kesan segar, elegan, dan profesional, sekaligus menambah kenyamanan dalam beraktivitas.
+            Nikmati pengalaman belanja di Sicare yang mudah, dan nyaman hanya di sini.</p>
+            Gunakan menu di samping untuk melihat produk favorit kamu.</p>
+            
+    </div>
+    <div class="card" style="margin-top:18px">
+    <h3>📌 Kontak & Media Sosial</h3>
+
+    <div class="contact-grid">
+        <div class="contact-item">
+            <span class="icon">📧</span>
+            <div>
+                <b>Email</b><br>
+                <a href="mailto:sicarestore@gmail.com">sicarestore@gmail.com</a>
+            </div>
+        </div>
+
+        <div class="contact-item">
+            <span class="icon">📷</span>
+            <div>
+                <b>Instagram</b><br>
+                <a href="https://instagram.com/sicare.store" target="_blank">
+                    @sicare.store
+                </a>
+            </div>
+        </div>
+
+        <div class="contact-item">
+            <span class="icon">📘</span>
+            <div>
+                <b>Facebook</b><br>
+                <a href="https://facebook.com/sicarestore" target="_blank">
+                    SiCare Store
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+</section>
+
+<!-- PRODUK (Admin can add products too) -->
+<section id="produk" class="section">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <h2>Daftar Produk</h2>
+        <button class="btn btn-white" onclick="openAddProduct()">+ Tambah Produk</button>
+    </div>
+    <div id="productList" class="products-grid"></div>
+</section>
+
+
+<!-- PEMBELIAN -->
+<section id="pembelian" class="section">
+    <h2>Pembelian</h2>
+    <div id="purchaseProductList" class="purchase-grid"></div>
+
+    <h3>Keranjang</h3>
+    <div id="cartList" class="list"></div>
+    <button class="btn btn-white" style="margin-top:10px" onclick="checkout()">Checkout</button>
+</section>
+
+<!-- PESANAN SAYA (User) -->
+<section id="pesananSaya" class="section">
+    <h2>Pesanan Saya</h2>
+    <div class="card">
+        <p class="small">
+            Masukkan nomor WhatsApp yang kamu pakai saat pesan
+        </p>
+        <input id="myWaInput" placeholder="0812...">
+        <button onclick="loadMyOrders()">Lihat Pesanan</button>
+    </div>
+
+    <div id="myOrdersList" class="list"></div>
+    <h3 style="margin-top:20px">Riwayat Pembatalan</h3>
+<div id="myCancelList" class="list"></div>
+</section>
+
+
+<!-- STOK -->
+<section id="stok" class="section">
+    <h2>Stok Barang</h2>
+    <div id="stockList" class="list"></div>
+</section>
+
+<!-- LAPORAN (ADMIN) -->
+<!-- LAPORAN (ADMIN) -->
+<section id="laporan" class="section">
+    <h2>Laporan (Admin)</h2>
+
+    <div class="card" style="margin-bottom:12px">
+        <h3>Laporan Pembelian</h3>
+        <div id="reportList" class="list"></div>
+    </div>
+
+    <div class="card">
+        <h3>Laporan Pembatalan</h3>
+        <div id="cancelList" class="list"></div>
+    </div>
+</section>
+
+
+<!-- POPUP TAMBAH PRODUK (ADMIN) -->
+<div class="overlay" id="popupAdd">
+    <div class="popup">
+        <h3>Tambah Produk</h3>
+
+        <input id="addName" type="text" placeholder="Nama produk">
+        <input id="addPrice" type="number" placeholder="Harga">
+        <input id="addStock" type="number" placeholder="Stok">
+        <input id="addImage" type="text" placeholder="URL Gambar (contoh: img/produk.jpg)">
+        <textarea id="addDesc" placeholder="Deskripsi produk (optional)"></textarea>
+
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:10px">
+            <button class="btn btn-ghost" onclick="closeAddProduct()">Batal</button>
+            <button class="btn btn-white" onclick="saveProduct()">Simpan</button>
+        </div>
+    </div>
+</div>
+
+<!-- POPUP DETAIL PRODUK (USER) -->
+<div class="overlay" id="popupDetail">
+    <div class="popup" id="detailBox">
+        <button class="back-icon" title="Kembali" onclick="closeDetail()">←</button>
+        <h3 id="detailName">Nama Produk</h3>
+        <img id="detailImg" src="" style="width:100%;border-radius:8px;margin-bottom:10px"/>
+        <p id="detailDesc" class="small"></p>
+        <p><b>Stok:</b> <span id="detailStock"></span></p>
+        <p class="price"><b>Harga:</b> Rp <span id="detailPrice"></span></p>
+
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:10px">
+            <button class="btn btn-ghost" onclick="closeDetail()">Tutup</button>
+            <button class="btn btn-white" onclick="openBuyerForm()">Tambah ke Keranjang</button>
+        </div>
+    </div>
+</div>
+
+<!-- POPUP FORM PEMBELI (muncul sebelum produk benar masuk keranjang) -->
+<div class="overlay" id="popupBuyer">
+    <div class="popup">
+        <button class="back-icon" title="Kembali" onclick="closeBuyerForm()">←</button>
+        <h3>Data Pembeli</h3>
+        <input id="buyerName" type="text" placeholder="Nama pembeli">
+        <input id="buyerAddress" type="text" placeholder="Alamat lengkap">
+        <input id="buyerWa" type="text" placeholder="Nomor WhatsApp (contoh: 0812...)">
+        <label class="small">Metode Pembayaran</label>
+        <select id="buyerPayment">
+            <option value="Transfer Bank">Bri</option>
+            <option value="Transfer Bank">Bca</option>
+            <option value="COD">COD (Bayar di Tempat)</option>
+            <option value="E-Wallet">E-Wallet</option>
+        </select>
+
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:10px">
+            <button class="btn btn-ghost" onclick="closeBuyerForm()">Batal</button>
+            <button class="btn btn-white" onclick="confirmAddToCart()">Simpan & Tambah</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ===============================================
+// DATA AWAL (semua produk sekarang punya deskripsi otomatis)
+// ===============================================
+let isAdmin = false;
+
+let products = [
+    {id:1, name:"Makarizo Shampo Royal Jelly", price:24500, stock:12, img:"shampo.jpg", description: "Shampo royal jelly yang membantu menguatkan akar rambut, mengurangi kerontokan, dan memberi kilau alami."},
+    {id:2, name:"Makarizo Conditioner", price:28000, stock:9, img:"conditionerr.jpg", description: "Conditioner lembut untuk melembapkan helai rambut, memudahkan penyisirannya dan mengurangi kusut."},
+    {id:3, name:"Makarizo Hair Mask", price:83500, stock:5, img:"hair mask.jpg", description: "Masker rambut intensif dengan nutrisi ekstra untuk mengembalikan kelembapan dan memperbaiki kerusakan."},
+    {id:4, name:"Makarizo Hair Mask Olive Extract", price:84900, stock:5, img:"hair mask olive extract.png", description: "Masker ber-ekstrak olive yang menutrisi, melembutkan, dan memberi kilau sehat pada rambut."},
+    {id:5, name:"Makarizo Hair Spray Cherry Blossoms", price:28890, stock:5, img:"hair spray cerry blossoms.webp", description: "Hair spray aroma cherry blossom: memberikan hold ringan dan wangi segar sepanjang hari."},
+    {id:6, name:"Makarizo Creambath Aloe & Mint", price:42810, stock:5, img:"creambath aloe & amp.png", description: "Creambath dengan aloe vera & mint yang menenangkan kulit kepala dan menyegarkan rambut."},
+    {id:7, name:"Makarizo Hair Spray Fresh Bouquet", price:28890, stock:5, img:"hair spray fresh bouquet.jpeg", description: "Hair spray fresh bouquet, cocok untuk styling harian dengan aroma lembut."},
+    {id:8, name:"Makarizo Serum", price:17500, stock:5, img:"serum.jpg", description: "Serum ringan untuk menghaluskan, mengontrol kusut, dan menambah kilau pada rambut."}
+];
+
+let cart = [];          // setiap item: {id, name, price, qty, buyer:{name,address,wa,payment}}
+let purchases = [];     // laporan pembelian (admin)
+let cancellations = []; // laporan pembatalan (admin)
+let selectedProduct = null; // produk yang sedang ditampilkan di popup
+let currentBuyer = null; // buyer info digunakan untuk mempermudah (disimpan sementara)
+
+// ===============================================
+// NAVIGASI
+// ===============================================
+function showSection(id, btn){
+    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+
+    document.querySelectorAll(".menu button").forEach(b => b.classList.remove("active"));
+    if(btn) btn.classList.add("active");
+
+    if(id === "produk") renderProducts();
+    if(id === "pembelian") renderPurchaseProducts();
+    if(id === "stok") renderStock();
+    if(id === "laporan") { renderReports(); renderCancellations(); }
+    if(id === "pesananSaya") { document.getElementById("myOrdersList").innerHTML = ""; }
+}
+
+// ===============================================
+// MODE ADMIN TOGGLE
+// ===============================================
+
+function applyAdminUI() {
+    const adminLabel = document.getElementById("adminLabel");
+
+    document.getElementById("menu-stok").style.display = isAdmin ? "block" : "none";
+    document.getElementById("menu-laporan").style.display = isAdmin ? "block" : "none";
+    adminLabel.style.display = isAdmin ? "block" : "none";
+
+    document.getElementById("modeToggle").innerText =
+        isAdmin ? "Mode User" : "Mode Admin";
+}
+
+document.getElementById("modeToggle").onclick = () => {
+    isAdmin = !isAdmin;
+    applyAdminUI();
+};
+
+
+// ===============================================
+// PRODUK (tampilan di halaman Produk - admin view / listing)
+// ===============================================
+function renderProducts(){
+    let list = document.getElementById("productList");
+    list.innerHTML = "";
+
+    products.forEach(p=>{
+        list.innerHTML += `
+        <div class="product-card">
+            <img src="${p.img}" alt="${p.name}">
+            <h4>${p.name}</h4>
+            <p>Stok: ${p.stock}</p>
+            <div class="price">Rp ${p.price.toLocaleString()}</div>
+            <div style="display:flex;gap:8px;margin-top:8px">
+                <button class="btn btn-white" onclick="openEditProduct(${p.id})">Edit</button>
+                <button class="btn btn-ghost" onclick="removeProduct(${p.id})">Hapus</button>
+            </div>
+        </div>`;
+    });
+}
+
+// ===============================================
+// PEMBELIAN (tampilan untuk pembeli) - tombol detail membuka popup
+// ===============================================
+function renderPurchaseProducts(){
+    let list = document.getElementById("purchaseProductList");
+    list.innerHTML = "";
+
+    products.forEach(p=>{
+        list.innerHTML += `
+        <div class="product-card">
+            <img src="${p.img}" alt="${p.name}" onclick="openDetail(${p.id})" style="cursor:pointer">
+            <h4>${p.name}</h4>
+            <p>Stok: ${p.stock}</p>
+            <div class="price">Rp ${p.price.toLocaleString()}</div>
+            <button class="btn btn-white" onclick="openDetail(${p.id})">Detail & Beli</button>
+        </div>`;
+    });
+
+    renderCart();
+}
+
+// ===============================================
+// DETAIL PRODUK POPUP
+// ===============================================
+function openDetail(id){
+    selectedProduct = products.find(x => x.id === id);
+    if(!selectedProduct) return;
+
+    document.getElementById("detailName").innerText = selectedProduct.name;
+    document.getElementById("detailImg").src = selectedProduct.img;
+    document.getElementById("detailDesc").innerText = selectedProduct.description;
+    document.getElementById("detailStock").innerText = selectedProduct.stock;
+    document.getElementById("detailPrice").innerText = selectedProduct.price.toLocaleString();
+
+    document.getElementById("popupDetail").style.display = "grid";
+}
+
+function closeDetail(){
+    document.getElementById("popupDetail").style.display = "none";
+}
+
+// ===============================================
+// FORM PEMBELI POPUP (wajib diisi sebelum masuk keranjang)
+// ===============================================
+function openBuyerForm(){
+    // prefill if currentBuyer exists
+    if(currentBuyer){
+        buyerName.value = currentBuyer.name;
+        buyerAddress.value = currentBuyer.address;
+        buyerWa.value = currentBuyer.wa;
+        buyerPayment.value = currentBuyer.payment || "Transfer Bank";
+    } else {
+        buyerName.value = "";
+        buyerAddress.value = "";
+        buyerWa.value = "";
+        buyerPayment.value = "Transfer Bank";
+    }
+
+    document.getElementById("popupBuyer").style.display = "grid";
+    closeDetail();
+}
+
+function closeBuyerForm(){
+    document.getElementById("popupBuyer").style.display = "none";
+}
+
+// ===============================================
+// KONFIRMASI TAMBAH KE KERANJANG (set buyer & tambah item)
+// ===============================================
+function confirmAddToCart(){
+    const name = document.getElementById("buyerName").value.trim();
+    const address = document.getElementById("buyerAddress").value.trim();
+    const wa = document.getElementById("buyerWa").value.trim();
+    const payment = document.getElementById("buyerPayment").value;
+
+    if(!name || !address || !wa){
+        alert("Semua data pembeli harus diisi (Nama, Alamat, No WA) sebelum menambahkan produk ke keranjang.");
+        return;
+    }
+
+    // Simpan buyer sebagai currentBuyer (mempermudah multiple add)
+    currentBuyer = {name, address, wa, payment};
+
+    // pastikan selectedProduct ada
+    if(!selectedProduct){
+        alert("Tidak ada produk yang dipilih.");
+        closeBuyerForm();
+        return;
+    }
+
+    // cek stock
+    if(selectedProduct.stock <= 0){
+        alert("Stok produk habis.");
+        closeBuyerForm();
+        return;
+    }
+
+    // tambahkan ke cart; bila item sudah ada id dan buyer sama => qty++ . 
+    let item = cart.find(c => c.id === selectedProduct.id && JSON.stringify(c.buyer) === JSON.stringify(currentBuyer));
+    if(item) item.qty++;
+    else cart.push({
+        id: selectedProduct.id,
+        name: selectedProduct.name,
+        price: selectedProduct.price,
+        qty: 1,
+        buyer: {...currentBuyer}
+    });
+
+    renderCart();
+    closeBuyerForm();
+    alert(selectedProduct.name + " berhasil ditambahkan ke keranjang untuk " + currentBuyer.name + ".");
+}
+
+// ===============================================
+// KERANJANG RENDER
+// ===============================================
+function renderCart(){
+    let list = document.getElementById("cartList");
+    list.innerHTML = "";
+
+    if(cart.length === 0){
+        list.innerHTML = "<div class='small'>Keranjang kosong.</div>";
+        return;
+    }
+
+    cart.forEach((i, idx)=>{
+        list.innerHTML += `
+        <div class="list-item">
+            <div>
+                <b>${i.name}</b><br>
+                <small>Qty: ${i.qty} • Pembeli: ${i.buyer.name} • Metode: ${i.buyer.payment || '-'}</small>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+                <div>Rp ${(i.qty * i.price).toLocaleString()}</div>
+                <button class="btn btn-ghost" onclick="removeFromCart(${idx})">Hapus</button>
+            </div>
+        </div>`;
+    });
+}
+function loadMyCancellations(){
+    const wa = document.getElementById("myWaInput").value.trim();
+    const list = document.getElementById("myCancelList");
+    list.innerHTML = "";
+
+    if(!wa) return;
+
+    const myCancels = cancellations.filter(c => c.buyer.wa === wa);
+
+    if(myCancels.length === 0){
+        list.innerHTML = "<div class='small'>Belum ada pembatalan.</div>";
+        return;
+    }
+
+    myCancels.forEach(c=>{
+        list.innerHTML += `
+        <div class="list-item">
+            <b>${c.date}</b><br>
+            <small>Produk: ${c.productsText}</small><br>
+            <small>Total: Rp ${c.total.toLocaleString()}</small><br>
+            <small>Status: ${c.status}</small>
+        </div>`;
+    });
+}
+
+
+function removeFromCart(index){
+    cart.splice(index,1);
+    renderCart();
+}
+
+// ===============================================
+// CHECKOUT -> Buat laporan dari isi cart
+// Grup per buyer -> buat entri purchase
+// ===============================================
+function checkout(){
+    if(cart.length === 0){
+        alert("Keranjang kosong!");
+        return;
+    }
+
+    // Group cart by buyer (in case multiple different buyers were used)
+    const grouped = {};
+    cart.forEach(item => {
+        const key = item.buyer.name + "||" + item.buyer.address + "||" + item.buyer.wa + "||" + (item.buyer.payment || "");
+        if(!grouped[key]) grouped[key] = {buyer:item.buyer, items:[]};
+        grouped[key].items.push(item);
+    });
+
+    // For each buyer group create a purchase entry
+    Object.values(grouped).forEach(group => {
+        let total = group.items.reduce((s, it) => s + (it.qty * it.price), 0);
+        let productList = group.items.map(it => `${it.name} (x${it.qty})`).join(", ");
+
+        const purchase = {
+            id: Date.now() + Math.floor(Math.random()*1000),
+            date: new Date().toLocaleString(),
+            buyer: group.buyer,
+            products: group.items.map(it => ({id:it.id, name:it.name, qty:it.qty, price:it.price})),
+            productsText: productList,
+            total: total,
+            status: "Diproses"
+        };
+
+        purchases.push(purchase);
+
+        // Kurangi stok produk sesuai qty
+        group.items.forEach(it => {
+            let p = products.find(x => x.id === it.id);
+            if(p) p.stock = Math.max(0, p.stock - it.qty);
+        });
+    });
+
+    // kosongkan cart & currentBuyer
+    cart = [];
+    currentBuyer = null;
+    renderPurchaseProducts();
+    renderCart();
+    renderReports();
+    renderCancellations();
+
+    alert("Checkout berhasil. Pesanan tersimpan di laporan.");
+}
+
+// ===============================================
+// STOK (Admin)
+function renderStock(){
+    let list = document.getElementById("stockList");
+    list.innerHTML = "";
+
+    products.forEach(p=>{
+        list.innerHTML += `
+        <div class="list-item">
+            <div>${p.name}<br><small>Stok: ${p.stock}</small></div>
+            <div style="display:flex;gap:8px">
+                <button class="btn btn-white" onclick="addStock(${p.id})">+ Tambah</button>
+                <button class="btn btn-ghost" onclick="openEditProduct(${p.id})">Edit</button>
+            </div>
+        </div>`;
+    });
+}
+
+function addStock(id){
+    let amt = parseInt(prompt("Tambah stok berapa?"));
+    if(isNaN(amt)) return;
+    let p = products.find(x => x.id === id);
+    if(p) p.stock += amt;
+    renderStock();
+}
+
+// ===============================================
+// LAPORAN (Admin) - Purchases
+
+function formatWaLink(wa){
+    return "https://wa.me/62" + wa.substring(1);
+}
+
+function renderReports(){
+    const list = document.getElementById("reportList");
+    list.innerHTML = "";
+
+    purchases.forEach(r=>{
+        list.innerHTML += `
+        <div class="list-item">
+            <b>${r.date}</b><br>
+            <small>
+                Pembeli:
+                <a href="${formatWaLink(r.buyer.wa)}" target="_blank">
+                    ${r.buyer.name}
+                </a>
+                • ${r.buyer.wa}
+            </small><br>
+            <small>Status: ${r.status}</small><br>
+            <button onclick="updatePurchaseStatus('${r.id}')">
+                Ubah Status
+            </button>
+        </div>`;
+    });
+}
+
+function updatePurchaseStatus(id){
+    const r = purchases.find(x => x.id === id);
+    if(!r) return;
+
+    const next = prompt("Status baru:", r.status);
+    if(next){
+        r.status = next;
+        renderReports();
+    }
+}
+
+renderReports();
+
+
+function updatePurchaseStatus(id){
+    const r = purchases.find(x=> x.id == id);
+    if(!r) return;
+    const next = prompt("Masukkan status baru (contoh: Sedang Dikirim / Selesai):", r.status);
+    if(next) {
+        r.status = next;
+        renderReports();
+    }
+}
+
+function deletePurchase(id){
+    if(!confirm("Hapus laporan pembelian ini?")) return;
+    purchases = purchases.filter(x => x.id != id);
+    renderReports();
+}
+
+
+// ===============================================
+// LAPORAN (Admin) - Cancellations
+function renderCancellations(){
+    let list = document.getElementById("cancelList");
+    list.innerHTML = "";
+
+    if(cancellations.length === 0){
+        list.innerHTML = "<div class='small'>Belum ada pembatalan.</div>";
+        return;
+    }
+
+    cancellations.forEach(r=>{
+        const waLink = formatWaLink(r.buyer.wa);
+        list.innerHTML += `
+        <div class="list-item">
+            <div>
+                <b>${r.date}</b><br>
+                <small>Pembeli: <a href="${waLink}" target="_blank">${r.buyer.name}</a> • ${r.buyer.wa}</small><br>
+                <small>Produk: ${r.productsText}</small><br>
+                <small>Keterangan: ${r.note || 'Dibatalkan oleh user'}</small>
+            </div>
+            <div style="text-align:right">
+                <div>Total: Rp ${r.total.toLocaleString()}</div>
+                <div style="margin-top:8px"><b>Status:</b> ${r.status}</div>
+                <div style="display:flex;gap:6px;margin-top:8px;justify-content:flex-end">
+                    <button class="btn btn-white" onclick="updateCancelStatus('${r.id}')">Ubah Status</button>
+                    <button class="btn btn-ghost" onclick="deleteCancellation('${r.id}')">Hapus</button>
+                </div>
+            </div>
+        </div>`;
+    });
+}
+
+function updateCancelStatus(id){
+    const r = cancellations.find(x=> x.id == id);
+    if(!r) return;
+    const next = prompt("Masukkan status baru (contoh: Dibatalkan / Sudah Refund):", r.status);
+    if(next) {
+        r.status = next;
+        renderCancellations();
+    }
+}
+
+function deleteCancellation(id){
+    if(!confirm("Hapus laporan pembatalan ini?")) return;
+    cancellations = cancellations.filter(x => x.id != id);
+    renderCancellations();
+}
+
+// ===============================================
+// USER - Pesanan Saya (lihat & cancel)
+
+
+
+function loadMyOrders(){
+    const wa = document.getElementById("myWaInput").value.trim();
+    const list = document.getElementById("myOrdersList");
+    list.innerHTML = "";
+
+    if(!wa){
+        alert("Masukkan nomor WhatsApp");
+        return;
+    }
+
+    const myOrders = purchases.filter(p => p.buyer.wa === wa);
+
+    if(myOrders.length === 0){
+        list.innerHTML = "<div class='small'>Tidak ada pesanan.</div>";
+        return;
+    }
+
+    myOrders.forEach(p=>{
+        const canCancel = p.status === "Diproses";
+
+        list.innerHTML += `
+        <div class="list-item">
+            <div>
+                <b>${p.date}</b><br>
+                <small>Produk: ${p.productsText}</small><br>
+                <small>Total: Rp ${p.total.toLocaleString()}</small><br>
+                <small><b>Status:</b> ${p.status}</small>
+            </div>
+
+            ${canCancel ? `
+            <div>
+                <button class="btn btn-ghost"
+                    onclick="cancelMyOrder('${p.id}')">
+                    Batalkan
+                </button>
+            </div>` : ``}
+        </div>`;
+    });
+}
+
+
+
+
+
+    const purchase = purchases[idx];
+
+    
+function cancelMyOrder(id){
+    if(!confirm("Yakin ingin membatalkan pesanan ini?")) return;
+
+    const idx = purchases.findIndex(p => p.id == id);
+    if(idx === -1){
+        alert("Pesanan tidak ditemukan.");
+        return;
+    }
+
+    const order = purchases[idx];
+
+    // pindahkan ke laporan pembatalan
+    cancellations.push({
+        id: Date.now(),
+        date: new Date().toLocaleString(),
+        buyer: order.buyer,
+        products: order.products,
+        productsText: order.productsText,
+        total: order.total,
+        status: "Dibatalkan",
+        note: "Dibatalkan oleh user"
+    });
+
+    // kembalikan stok
+    order.products.forEach(pr=>{
+        const prod = products.find(x=>x.id===pr.id);
+        if(prod) prod.stock += pr.qty;
+    });
+
+    // hapus dari purchases
+    purchases.splice(idx,1);
+
+    loadMyOrders();
+    loadMyCancellations();   // ⬅️ PENTING
+    renderPurchaseProducts();
+    renderReports();
+    renderCancellations();
+
+    alert("Pesanan berhasil dibatalkan.");cellations();    // update laporan pembatalan
+}
+
+
+
+    // pindahkan ke cancellations, set note/status/time
+    const cancelReport = {
+        id: Date.now() + Math.floor(Math.random()*1000),
+        date: new Date().toLocaleString(),
+        buyer: purchase.buyer,
+        products: purchase.products,
+        productsText: purchase.productsText,
+        total: purchase.total,
+        status: "Dibatalkan oleh user",
+        note: "Dibatalkan oleh user melalui Pesanan Saya"
+    };
+
+    cancellations.push(cancelReport);
+
+    // kembalikan stok sesuai qty
+    purchase.products.forEach(pr => {
+        let prod = products.find(x => x.id === pr.id);
+        if(prod) prod.stock += pr.qty;
+    });
+
+    // hapus dari purchases
+    purchases.splice(idx,1);
+
+    // refresh tampilan
+    renderReports();{
+    renderCancellations();
+    loadMyOrders(); // refresh user's view
+    renderPurchaseProducts(); // update product listing & stok
+
+    alert("Pesanan dibatalkan dan masuk ke laporan pembatalan. Admin akan dikonfirmasi.");
+}
+
+function messageAdmin(waNumber){
+    const link = formatWaLink(waNumber);
+    window.open(link, "_blank");
+    loadMyCancellations();
+}
+
+// ===============================================
+// TAMBAH / EDIT / HAPUS PRODUK (Admin)
+function openAddProduct(){
+    document.getElementById("addName").value = "";
+    document.getElementById("addPrice").value = "";
+    document.getElementById("addStock").value = "";
+    document.getElementById("addImage").value = "";
+    document.getElementById("addDesc").value = "";
+    document.getElementById("popupAdd").style.display = "grid";
+}
+
+function closeAddProduct(){
+    document.getElementById("popupAdd").style.display = "none";
+}
+
+function saveProduct(){
+    const name = document.getElementById("addName").value.trim();
+    const price = parseInt(document.getElementById("addPrice").value);
+    const stock = parseInt(document.getElementById("addStock").value);
+    const img = document.getElementById("addImage").value.trim() || "placeholder.jpg";
+    const desc = document.getElementById("addDesc").value.trim() || "Deskripsi produk belum disediakan.";
+
+    if(!name || isNaN(price) || isNaN(stock)){
+        alert("Nama, harga, dan stok wajib diisi dengan benar.");
+        return;
+    }
+
+    products.push({
+        id: Date.now() + Math.floor(Math.random()*1000),
+        name,
+        price,
+        stock,
+        img,
+        description: desc
+    });
+
+    closeAddProduct();
+    renderProducts();
+    renderStock();
+    renderPurchaseProducts();
+}
+
+// edit product (pre-fill popup)
+function openEditProduct(id){
+    const p = products.find(x => x.id === id);
+    if(!p) return;
+
+    document.getElementById("addName").value = p.name;
+    document.getElementById("addPrice").value = p.price;
+    document.getElementById("addStock").value = p.stock;
+    document.getElementById("addImage").value = p.img;
+    document.getElementById("addDesc").value = p.description || "";
+
+    document.getElementById("popupAdd").style.display = "grid";
+
+    // replace saveProduct with saveEdit once confirmed
+    const saveBtn = document.querySelector("#popupAdd .btn-white");
+    saveBtn.onclick = function saveEdit(){
+        const name = document.getElementById("addName").value.trim();
+        const price = parseInt(document.getElementById("addPrice").value);
+        const stock = parseInt(document.getElementById("addStock").value);
+        const img = document.getElementById("addImage").value.trim() || "placeholder.jpg";
+        const desc = document.getElementById("addDesc").value.trim() || "Deskripsi produk belum disediakan.";
+
+        if(!name || isNaN(price) || isNaN(stock)){
+            alert("Nama, harga, dan stok wajib diisi dengan benar.");
+            return;
+        }
+
+        p.name = name; p.price = price; p.stock = stock; p.img = img; p.description = desc;
+
+        // restore original save handler
+        saveBtn.onclick = saveProduct;
+        closeAddProduct();
+        renderProducts();
+        renderStock();
+        renderPurchaseProducts();
+    }
+}
+
+function removeProduct(id){
+    if(!confirm("Hapus produk ini?")) return;
+    products = products.filter(x => x.id !== id);
+    renderProducts();
+    renderPurchaseProducts();
+    renderStock();
+}
+
+// ===============================================
+// GLOBAL SEARCH (works on produk and pembelian views)
+document.getElementById("globalSearch").oninput = function(){
+    let q = this.value.toLowerCase();
+
+    let result = products.filter(p => p.name.toLowerCase().includes(q));
+
+    if(document.getElementById("produk").classList.contains("active")){
+        let list = document.getElementById("productList");
+        list.innerHTML = "";
+        result.forEach(p=>{
+            list.innerHTML += `
+            <div class="product-card">
+                <img src="${p.img}">
+                <h4>${p.name}</h4>
+                <p>Stok: ${p.stock}</p>
+                <div class="price">Rp ${p.price.toLocaleString()}</div>
+                <div style="display:flex;gap:8px;margin-top:8px">
+                    <button class="btn btn-white" onclick="openEditProduct(${p.id})">Edit</button>
+                    <button class="btn btn-ghost" onclick="removeProduct(${p.id})">Hapus</button>
+                </div>
+            </div>`;
+        });
+    }
+
+    if(document.getElementById("pembelian").classList.contains("active")){
+        let list = document.getElementById("purchaseProductList");
+        list.innerHTML = "";
+        result.forEach(p=>{
+            list.innerHTML += `
+            <div class="product-card">
+                <img src="${p.img}">
+                <h4>${p.name}</h4>
+                <p>Stok: ${p.stock}</p>
+                <div class="price">Rp ${p.price.toLocaleString()}</div>
+                <button class="btn btn-white" onclick="openDetail(${p.id})">Detail & Beli</button>
+            </div>`;
+        });
+    }
+};
+
+// ===============================================
+// LOGOUT
+
+function logout() {
+    // Hapus status login
+    localStorage.removeItem("loggedIn");
+
+    // Arahkan ke halaman login
+    window.location.href = "login.html";
+}
+
+// ===============================================
+// HELPERS: WA link formatter & normalizer
+function formatWaLink(raw){
+    if(!raw) return "#";
+    let normalized = normalizeWa(raw);
+    return `https://wa.me/${normalized}`;
+}
+function normalizeWa(raw){
+    let s = raw.trim();
+    s = s.replace(/\s+/g, "");
+    // if starts with +, drop +
+    if(s.startsWith("+")) s = s.slice(1);
+    // if starts with 0 (local Indonesian), replace with 62
+    if(s.startsWith("0")) s = "62" + s.slice(1);
+    return s;
+}
+
+// ===============================================
+// INISIALISASI HALAMAN
+// ===============================================
+function init(){
+    const role = localStorage.getItem("role");
+
+    if(role === "admin"){
+        isAdmin = true;
+    }
+
+    applyAdminUI();
+
+    renderProducts();
+    renderPurchaseProducts();
+    renderStock();
+    renderReports();
+    renderCancellations();
+
+    const saveBtn = document.querySelector("#popupAdd .btn-white");
+    if(saveBtn) saveBtn.onclick = saveProduct;
+}
+
+if(localStorage.getItem("role") !== "admin"){
+    document.getElementById("modeToggle").style.display = "none";
+}
+
+
+
+</script>
+</body>
+</html>

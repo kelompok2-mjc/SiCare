@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - Si Care Store</title>
+
+<style>
+body {
+    font-family: Arial;
+    background:#ffb6c1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+.box {
+    width: 320px;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    text-align:center;
+}
+input {
+    width:80%;
+    padding:10px;
+    margin:10px 0;
+}
+button {
+    width:100%;
+    padding:10px;
+    background:#ff69b4;
+    color:white;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+button:hover { background:#ff1493; }
+.link {
+    margin-top:10px;
+    color:#ff1493;
+    cursor:pointer;
+    font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+    <h2 id="title">Login</h2>
+
+    <!-- LOGIN FORM -->
+    <div id="loginForm">
+        <input id="loginUser" placeholder="Username">
+        <input id="loginPass" type="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <div class="link" onclick="showRegister()">Belum punya akun? Daftar</div>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="registerForm" style="display:none;">
+        <input id="regUser" placeholder="Username">
+        <input id="regPass" type="password" placeholder="Password">
+        <button onclick="register()">Daftar</button>
+        <div class="link" onclick="showLogin()">Sudah punya akun? Login</div>
+    </div>
+
+</div>
+
+<script>
+// ====================
+// LOGIN ADMIN FIXED
+// ====================
+const adminUser = "admin";
+const adminPass = "admin12";
+
+function login() {
+    let user = loginUser.value.trim();
+    let pass = loginPass.value.trim();
+
+    // Login admin (tetap seperti konsep awal)
+    if (user === adminUser && pass === adminPass) {
+        localStorage.setItem("loggedIn", "true");
+        localStorage.setItem("role", "admin");
+        alert("Login admin berhasil!");
+        window.location.href = "index.html";
+        return;
+    }
+
+    // Login user dari localStorage
+    let users = JSON.parse(localStorage.getItem("users")) || [];
+
+    let found = users.find(u => u.username === user && u.password === pass);
+
+    if (found) {
+        localStorage.setItem("loggedIn", "true");
+        localStorage.setItem("role", "user");
+        alert("Login berhasil!");
+        window.location.href = "index.html";
+    } else {
+        alert("Username atau password salah!");
+    }
+}
+
+// ====================
+// REGISTER USER
+// ====================
+function register() {
+    let user = regUser.value.trim();
+    let pass = regPass.value.trim();
+
+    if (!user || !pass) {
+        alert("Semua data wajib diisi!");
+        return;
+    }
+
+    let users = JSON.parse(localStorage.getItem("users")) || [];
+
+    if (users.some(u => u.username === user)) {
+        alert("Username sudah terdaftar!");
+        return;
+    }
+
+    users.push({ username: user, password: pass });
+    localStorage.setItem("users", JSON.stringify(users));
+
+    alert("Registrasi berhasil! Silakan login.");
+    showLogin();
+}
+
+// ====================
+// TOGGLE FORM
+// ====================
+function showRegister() {
+    loginForm.style.display = "none";
+    registerForm.style.display = "block";
+    title.innerText = "Registrasi";
+}
+
+function showLogin() {
+    registerForm.style.display = "none";
+    loginForm.style.display = "block";
+    title.innerText = "Login";
+}
+</script>
+
+</body>
+</html>
