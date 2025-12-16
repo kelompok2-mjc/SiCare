@@ -1080,16 +1080,21 @@ document.getElementById("globalSearch").oninput = function(){
     }
 };
 
+// PROTEKSI HALAMAN BERANDA
+if (!localStorage.getItem("loggedIn")) {
+    window.location.href = "index.html";
+}
+
+
 // ===============================================
 // LOGOUT
 
 function logout() {
-    // Hapus status login
     localStorage.removeItem("loggedIn");
-
-    // Arahkan ke halaman login
-    window.location.href = "login.html";
+    localStorage.removeItem("role");
+    window.location.href = "index.html"; // login
 }
+
 
 // ===============================================
 // HELPERS: WA link formatter & normalizer
