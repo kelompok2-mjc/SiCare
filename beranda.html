@@ -382,6 +382,9 @@ body{
 // ===============================================
 let isAdmin = false;
 
+const ADMIN_WA = "6285742407399"; // ganti dengan WA admin SiCare
+
+
 let products = [
     {id:1, name:"Makarizo Shampo Royal Jelly", price:24500, stock:12, img:"shampo.jpg", description: "Shampo royal jelly yang membantu menguatkan akar rambut, mengurangi kerontokan, dan memberi kilau alami."},
     {id:2, name:"Makarizo Conditioner", price:28000, stock:9, img:"conditionerr.jpg", description: "Conditioner lembut untuk melembapkan helai rambut, memudahkan penyisirannya dan mengurangi kusut."},
@@ -664,6 +667,7 @@ function checkout(){
 
         purchases.push(purchase);
 
+
         // Kurangi stok produk sesuai qty
         group.items.forEach(it => {
             let p = products.find(x => x.id === it.id);
@@ -725,9 +729,11 @@ function renderReports(){
             <b>${r.date}</b><br>
             <small>
                 Pembeli:
-                <a href="${formatWaLink(r.buyer.wa)}" target="_blank">
-                    ${r.buyer.name}
-                </a>
+                <button class="btn btn-white"
+    onclick='openAdminConfirmation(${JSON.stringify(r)})'>
+    💬 ${r.buyer.name}
+</button>
+
                 • ${r.buyer.wa}
             </small><br>
             <small>Status: ${r.status}</small><br>
@@ -1112,6 +1118,39 @@ function normalizeWa(raw){
     if(s.startsWith("0")) s = "62" + s.slice(1);
     return s;
 }
+
+function openAdminConfirmation(purchase){
+    const message = `
+🌸 Konfirmasi Pesanan – SiCare Store 🌸
+
+Halo Kak ${purchase.buyer.name} 😊
+Terima kasih sudah berbelanja di *SiCare Store* 💖
+
+Pesanan Kakak sudah kami terima dengan detail berikut:
+
+🧾 *Detail Pesanan*
+Nama: ${purchase.buyer.name}
+Alamat: ${purchase.buyer.address}
+Metode Pembayaran: ${purchase.buyer.payment}
+
+Produk:
+${purchase.productsText}
+
+Total: Rp ${purchase.total.toLocaleString()}
+
+Pesanan akan segera kami proses ✨  
+Jika ada pertanyaan terkait pesanan, silakan balas chat ini ya 💬  
+Kami dengan senang hati siap membantu 🌷
+
+Terima kasih atas kepercayaan Kakak 🤍
+`;
+
+    const wa = normalizeWa(purchase.buyer.wa);
+    const url = `https://wa.me/${wa}?text=${encodeURIComponent(message)}`;
+    window.open(url, "_blank");
+}
+
+
 
 // ===============================================
 // INISIALISASI HALAMAN
